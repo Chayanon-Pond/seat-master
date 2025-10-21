@@ -3,13 +3,12 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FiHome, FiClock, FiRepeat, FiLogOut } from "react-icons/fi";
 
 type SidebarItemDef = {
   id: string;
   name: string;
   path: string;
-  icon: React.ElementType;
+  icon: string | React.ElementType;
 };
 
 export default function Sidebar() {
@@ -20,29 +19,29 @@ export default function Sidebar() {
       id: "home",
       name: "Home",
       path: "/admin/dashboard",
-      icon: FiHome,
+      icon: "/home.svg",
     },
     {
       id: "history",
       name: "History",
       path: "/admin/dashboard/history",
-      icon: FiClock,
+      icon: "/inbox.svg",
     },
     {
-      id: "recurring",
-      name: "Recurring",
+      id: "Switch to user",
+      name: "Switch to user",
       path: "/admin/dashboard/recurring",
-      icon: FiRepeat,
+      icon: "/refresh-ccw.svg",
     },
   ];
 
   return (
     <div className="bg-white w-[240px] h-screen shadow-md flex flex-col border-3 border-gray-200 border-b-0 border-t-0">
-      <div className="p-6 pb-12 flex flex-col items-center">
+      <div className="pt-15 pr-14 pb-2 flex flex-col items-center">
         <div className="max-w-screen-xl h-full hidden sm:flex items-center justify-between lg:mx-[120px] mx-6 px-6">
           <Link
             href="/admin/dashboard"
-            className=""
+            className="text-[40px] font-semibold text-black w-full text-right"
             style={{ WebkitBackgroundClip: "text" }}
           >
             Admin
@@ -63,23 +62,38 @@ export default function Sidebar() {
                 className={`flex items-center px-5 py-3 mx-3 my-0.5 rounded-md cursor-pointer transition-colors duration-150 ease-in-out
                     ${
                       isActive
-                        ? "bg-blue-50 text-blue-700 font-semibold"
-                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                        ? "bg-[var(--color-sidebar-hover)] text-gray-800 font-normal"
+                        : "text-gray-600 hover:bg-[var(--color-sidebar-hover)] hover:text-gray-800"
                     }`}
               >
-                <item.icon
-                  className={`w-5 h-5 mr-3 
-                    ${isActive ? "text-blue-500" : "text-gray-400"}`}
-                />
+                {typeof item.icon === "string" ? (
+                  <img
+                    src={item.icon}
+                    alt={`${item.name} icon`}
+                    className={`w-5 h-5 mr-3 object-contain ${
+                      isActive ? "opacity-100" : "opacity-70"
+                    }`}
+                  />
+                ) : (
+                  <item.icon
+                    className={`w-5 h-5 mr-3 ${
+                      isActive ? "text-gray-700" : "text-gray-400"
+                    }`}
+                  />
+                )}
                 <span>{item.name}</span>
               </div>
             </Link>
           );
         })}
       </nav>
-      <div className="mb-100">
-        <button className="{`flex items-center px-5 py-3 mx-3 my-0.5 rounded-md cursor-pointer transition-colors duration-150 ease-in-out text-gray-600 hover:bg-gray-100 hover:text-gray-800`}">
-          <FiLogOut className="w-5 h-5 mr-3 text-gray-400" />
+      <div className="mb-10">
+        <button className="flex items-center px-5 py-3 mx-3 my-0.5 rounded-md cursor-pointer transition-colors duration-150 ease-in-out text-gray-600 hover:bg-[var(--color-sidebar-hover)] hover:text-gray-800">
+          <img
+            src="/log-out.svg"
+            alt="Log out"
+            className="w-5 h-5 mr-3 object-contain opacity-70"
+          />
           <span>Log out</span>
         </button>
       </div>

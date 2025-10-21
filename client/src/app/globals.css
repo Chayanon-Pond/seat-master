@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@100;200;300;400;500;600;700&display=swap');
 
 @layer utilities{
@@ -26,6 +27,7 @@
   --foreground: #171717;
   --font-ibm-thai: 'IBM Plex Sans Thai', sans-serif;
   --font-roboto: 'Roboto', sans-serif;
+  --color-sidebar-hover: #EAF5F9;
 }
 
 @theme inline {
