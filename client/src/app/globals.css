@@ -1,8 +1,33 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@100;200;300;400;500;600;700&display=swap');
 
+@layer utilities{
+  :root {
+  --color-blue: #0070A4;
+  --color-teal: #00A58B;
+  --color-red: #E84E4E;
+  --color-light-blue: #1692EC;
+  --color-gray-50: #F9FAFB;
+  --color-gray-100: #F3F4F6;
+  --color-gray-200: #E5E7EB;
+  --color-gray-300: #D1D5DB;
+  --color-gray-600: #4B5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1F2937;
+  --color-gray-900: #111827;
+  --font-roboto: 'Roboto', sans-serif;
+  --font-ibm-thai: 'IBM Plex Sans Thai', sans-serif;
+  --font-sans: 'Inter';
+
+  }
+}
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-ibm-thai: 'IBM Plex Sans Thai', sans-serif;
+  --font-roboto: 'Roboto', sans-serif;
+  --color-sidebar-hover: #EAF5F9;
 }
 
 @theme inline {
@@ -12,15 +37,8 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  font-family: var(--font-roboto);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+
