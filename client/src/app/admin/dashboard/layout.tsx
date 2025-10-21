@@ -1,5 +1,6 @@
 import React from "react";
 import Sidebar from "../components/Sidebar";
+import { ConcertProvider } from "../context/concertContext";
 
 export default function AdminLayout({
   children,
@@ -7,13 +8,15 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex">
-      <div className="fixed">
-        <Sidebar />
+    <ConcertProvider>
+      <div className="flex">
+        <div className="fixed">
+          <Sidebar />
+        </div>
+        <main className="flex-1 bg-gray-50 min-h-screen ml-[240px]">
+          {children}
+        </main>
       </div>
-      <main className="flex-1 bg-gray-50 min-h-screen ml-[240px]">
-        {children}
-      </main>
-    </div>
+    </ConcertProvider>
   );
 }
