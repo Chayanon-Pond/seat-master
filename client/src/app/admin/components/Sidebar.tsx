@@ -24,7 +24,7 @@ export default function Sidebar() {
     {
       id: "history",
       name: "History",
-      path: "/admin/dashboard/history",
+      path: "/admin/dashboard/historys",
       icon: "/inbox.svg",
     },
     {
