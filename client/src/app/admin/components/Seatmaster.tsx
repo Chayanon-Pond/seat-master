@@ -2,11 +2,21 @@
 
 import React, { useMemo, useState } from "react";
 import Cardconcerts from "./Cardconcerts";
+import ConcertCreate from "./Concertcreate";
 import { useConcertsContext } from "../context/concertContext";
 
-export default function Seatmaster() {
-  const { concerts, handleDeleteConcert } = useConcertsContext();
+export default function Seatmaster({
+  onTabChange,
+}: {
+  onTabChange?: (tab: "overview" | "create") => void;
+}) {
+  const { concerts, handleDeleteConcert, fetchConcerts } = useConcertsContext();
   const [tab, setTab] = useState<"overview" | "create">("overview");
+
+  const handleTabChange = (newTab: "overview" | "create") => {
+    setTab(newTab);
+    onTabChange?.(newTab);
+  };
 
   const totals = useMemo(() => {
     const totalSeats = concerts.reduce(
@@ -56,7 +66,7 @@ export default function Seatmaster() {
         <div className="flex items-center justify-between pb-3 mb-4">
           <div className="flex gap-4 items-center">
             <button
-              onClick={() => setTab("overview")}
+              onClick={() => handleTabChange("overview")}
               style={{ fontFamily: "Roboto, sans-serif" }}
               className={`text-[24px] font-semibold px-3 py-1  cursor-pointer ${
                 tab === "overview"
@@ -67,7 +77,7 @@ export default function Seatmaster() {
               Overview
             </button>
             <button
-              onClick={() => setTab("create")}
+              onClick={() => handleTabChange("create")}
               style={{ fontFamily: "Roboto, sans-serif" }}
               className={`text-[24px] font-semibold px-3 py-1  cursor-pointer ${
                 tab === "create"
@@ -93,8 +103,11 @@ export default function Seatmaster() {
         )}
 
         {tab === "create" && (
-          <div className="py-8 text-gray-600">
-            Create form placeholder (implement later)
+          <div>
+            <ConcertCreate onCreateSuccess={() => {
+              fetchConcerts();
+              handleTabChange("overview");
+            }} />
           </div>
         )}
       </div>

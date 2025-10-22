@@ -24,7 +24,7 @@
   }
 }
 :root {
-  --background: #ffffff;
+  --background: #D0E7D2; 
   --foreground: #171717;
   --font-ibm-thai: 'IBM Plex Sans Thai', sans-serif;
   --font-roboto: 'Roboto', sans-serif;
@@ -40,12 +40,35 @@
 
 body {
   font-family: var(--font-roboto);
+  background-color: var(--background);
 }
 
 @layer components {
   .btn-delete {
     @apply inline-flex items-center gap-2 text-white rounded text-sm hover:opacity-80 cursor-pointer py-3 px-4;
     background-color: var(--color-red);
+  }
+
+  .btn-save {
+    @apply text-white rounded font-medium hover:opacity-80 disabled:opacity-50 transition-colors flex items-center justify-center;
+    background-color: var(--color-light-blue);
+    font-family: var(--font-roboto);
+    font-size: 24px;
+    cursor: pointer;
+    width: 160px;
+    height: 60px;
+    gap: 24px;
+  }
+
+  .form-container {
+    @apply flex flex-col;
+    width: 1120px;
+    height: fit-content;
+    border-radius: 8px;
+    border: 1px solid var(--color-border-light);
+    padding: 40px;
+    gap: 32px;
+    background-color: transparent;
   }
 }
 
