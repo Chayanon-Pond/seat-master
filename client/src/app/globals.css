@@ -16,6 +16,7 @@
   --color-gray-700: #374151;
   --color-gray-800: #1F2937;
   --color-gray-900: #111827;
+  --color-border-light: #C2C2C2;
   --font-roboto: 'Roboto', sans-serif;
   --font-ibm-thai: 'IBM Plex Sans Thai', sans-serif;
   --font-sans: 'Inter';
@@ -39,6 +40,13 @@
 
 body {
   font-family: var(--font-roboto);
+}
+
+@layer components {
+  .btn-delete {
+    @apply inline-flex items-center gap-2 text-white rounded text-sm hover:opacity-80 cursor-pointer py-3 px-4;
+    background-color: var(--color-red);
+  }
 }
 
 

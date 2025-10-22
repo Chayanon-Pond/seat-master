@@ -8,8 +8,8 @@ export class HistorysListAdminService {
     ) {}
 
     async getHistories() {
-        const histories = await this.databaseService.query("SELECT * FROM histories");
-        if (!histories) {
+        const histories = await this.databaseService.query("SELECT * FROM history");
+        if (!histories || histories.length === 0) {
             throw new NotFoundException("No histories found");
         }
         return histories;

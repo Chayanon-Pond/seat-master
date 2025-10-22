@@ -54,24 +54,34 @@ export const ConcertProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     setError(null);
     try {
-      const queryParams = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: concertPerPage.toString(),
-      });
-      const response = await fetch(`/api/concerts?${queryParams.toString()}`);
+      const response = await fetch(
+        `http://localhost:5000/api/admin/concerts`
+      );
       if (!response.ok) {
         throw new Error(`Failed to fetch concerts: ${response.statusText}`);
       }
-      const data = await response.json();
-      setConcerts(data.concerts);
-      setPagination(data.pagination);
+      const allData = await response.json();
+      const totalPages = Math.ceil(allData.length / concertPerPage);
+      
+      // Get concerts for current page
+      const startIndex = (currentPage - 1) * concertPerPage;
+      const endIndex = startIndex + concertPerPage;
+      const paginatedConcerts = allData.slice(startIndex, endIndex);
+      
+      setConcerts(paginatedConcerts);
+      setPagination({
+        totalItems: allData.length,
+        totalPages: totalPages,
+        currentPage: currentPage,
+        limit: concertPerPage,
+      });
     } catch (error) {
       setError((error as Error).message);
       console.error("Error fetching concerts:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage]);
+  }, [currentPage, concertPerPage]);
 
   useEffect(() => {
     fetchConcerts();
@@ -95,9 +105,12 @@ export const ConcertProvider = ({ children }: { children: ReactNode }) => {
   const confirmDelete = useCallback(async () => {
     if (!concertToDelete) return;
     try {
-      const response = await fetch(`/api/concerts/${concertToDelete}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/admin/concerts-delete/${concertToDelete}`,
+        {
+          method: "DELETE",
+        }
+      );
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to delete concert");

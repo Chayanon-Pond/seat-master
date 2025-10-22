@@ -3,9 +3,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './lib/database/database.module';
 import { HistorysListAdminModule } from './api/admin/historys-list/module';
+import { ConcertListAdminModule } from './api/admin/concerts/module';
+import { ConcertDeleteAdminModule } from './api/admin/concerts-delete/[id]/module';
+
 
 @Module({
-  imports: [DatabaseModule, HistorysListAdminModule],
+  imports: [DatabaseModule, HistorysListAdminModule, ConcertListAdminModule, ConcertDeleteAdminModule],
   controllers: [AppController],
   providers: [AppService],
 })
