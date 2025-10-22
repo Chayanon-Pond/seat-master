@@ -2,9 +2,10 @@
 
 import React from "react";
 import { useHistory } from "../../hooks/useHistory";
+import Pagination from "../../components/Pagination";
 
 const HistorysPage: React.FC = () => {
-	const { histories, isLoading, error } = useHistory();
+	const { histories, isLoading, error, currentPage, setCurrentPage, totalPages } = useHistory();
 
 	if (isLoading) return <div>Loading...</div>;
 	if (error) return <div className="text-red-600">{error}</div>;
@@ -29,9 +30,9 @@ const HistorysPage: React.FC = () => {
 						) : (
 							histories.map((h) => (
 								<tr key={h.id} className="odd:bg-white even:bg-gray-50">
-									<td className="border border-gray-300 px-4 py-2 align-top">{h.createdAt}</td>
-									<td className="border border-gray-300 px-4 py-2 align-top">{h.userName}</td>
-									<td className="border border-gray-300 px-4 py-2 align-top">{h.concertName}</td>
+									<td className="border border-gray-300 px-4 py-2 align-top">{h.created_at}</td>
+									<td className="border border-gray-300 px-4 py-2 align-top">{h.username}</td>
+									<td className="border border-gray-300 px-4 py-2 align-top">{h.concert_name}</td>
 									<td className="border border-gray-300 px-4 py-2 align-top">{h.action}</td>
 								</tr>
 							))
@@ -39,6 +40,11 @@ const HistorysPage: React.FC = () => {
 					</tbody>
 				</table>
 			</div>
+			<Pagination 
+				currentPage={currentPage} 
+				totalPages={totalPages} 
+				onPageChange={setCurrentPage}
+			/>
 		</div>
 	);
 };

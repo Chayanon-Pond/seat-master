@@ -14,29 +14,31 @@ export default function Cardconcerts({ concert, onDelete }: CardProps) {
   const seats = concert.seat ?? concert.seats ?? concert.available_seats ?? 0;
 
   return (
-    <div className="border rounded p-4 bg-white">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <h3 className="text-blue-600 font-semibold">{title}</h3>
-          <hr className="my-3 border-t border-gray-200" />
-          <p className="text-sm text-gray-600">{description}</p>
+    <div
+      className="border rounded-lg p-10 bg-white flex flex-col gap-8 w-full max-w-[1120px] h-[360px]"
+      style={{ borderColor: "var(--color-border-light)" }}
+    >
+      <div className="flex-1">
+        <h3 className="text-blue-600 font-semibold text-lg">{title}</h3>
+        <hr className="my-3 border-t border-gray-200" />
+        <p className="text-sm text-gray-600">{description}</p>
+      </div>
+
+      <div className="flex flex-row items-center gap-4 justify-between">
+        <div className="flex items-center gap-2 text-gray-600">
+          <FiUser size={20} />
+          <span className="text-sm">{seats}</span>
         </div>
 
-        <div className="flex flex-col items-end justify-between">
-          <div className="flex items-center gap-2 text-gray-600">
-            <FiUser />
-            <span className="text-sm">{seats}</span>
-          </div>
-
-          <div className="mt-4">
-            <button
-              onClick={() => onDelete(concert.id)}
-              className="inline-flex items-center gap-2 px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
-            >
-              <FiTrash2 /> Delete
-            </button>
-          </div>
-        </div>
+        <button
+          onClick={() => onDelete(concert.id)}
+          className="inline-flex items-center gap-2 text-white rounded text-sm hover:opacity-80 cursor-pointer py-3 px-4"
+          style={{
+            backgroundColor: "var(--color-red)",
+          }}
+        >
+          <FiTrash2 size={16} /> Delete
+        </button>
       </div>
     </div>
   );
