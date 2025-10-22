@@ -19,6 +19,7 @@ function DashboardContent() {
     handleDeleteConcert,
     setCurrentPage,
   } = useConcertsContext();
+  const [activeTab, setActiveTab] = React.useState<"overview" | "create">("overview");
 
   useEffect(() => {
     const shouldRefetch = searchParams.get("refetch") === "true";
@@ -62,7 +63,7 @@ function DashboardContent() {
   return (
     <div className="bg-gray-100 flex flex-col flex-1 min-h-screen">
       <div>
-        <Seatmaster />
+        <Seatmaster onTabChange={setActiveTab} />
       </div>
       <div>
         {!isLoading && !error && concerts.length === 0 && (
@@ -71,7 +72,7 @@ function DashboardContent() {
           </div>
         )}
 
-        {totalPages > 0 && (
+        {activeTab === "overview" && totalPages > 0 && (
           <div className="mt-4">
             <Pagination
               currentPage={currentPage}

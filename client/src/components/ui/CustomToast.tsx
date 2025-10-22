@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { createRoot } from "react-dom/client";
 
 type Variant = "default" | "success" | "error";
 
@@ -7,58 +8,148 @@ interface CustomToastProps {
   description?: string;
   variant?: Variant;
   onClose?: () => void;
+  duration?: number;
 }
 
-/**
- * CustomToast
- * - Typography: 14px, IBM Plex Sans Thai (fallbacks)
- * - Text color: #2B2B2B
- * - Padding: 6px top/bottom, 16px left/right
- * - Border radius: 6px
- * - Simple variants: success / error / default
- */
 export function CustomToast({
   title,
   description,
   variant = "default",
   onClose,
+  duration = 4000,
 }: CustomToastProps) {
-  const variantClasses: Record<Variant, string> = {
-    default: "bg-white border-[rgba(0,0,0,0.04)]",
-    success: "bg-[#D0E7D2] border-[rgba(0,0,0,0.06)]",
-    error: "bg-[#FCEAEA] border-[rgba(0,0,0,0.06)]",
+  const variantClasses: Record<Variant, { container: string; text: string }> = {
+    default: {
+      container: "bg-[var(--background)] border-[rgba(0,0,0,0.04)]",
+      text: "text-white",
+    },
+    success: { container: "bg-[var(--background)]", text: "text-white" },
+    error: { container: "bg-[var(--background)]", text: "text-white" },
   };
 
   const containerClass = [
-    "relative max-w-[420px] shadow-md",
-    "py-1.5 px-4 rounded-[6px]",
-    "flex flex-col gap-1.5",
-    "text-[#2B2B2B] text-sm leading-5",
-    variantClasses[variant],
-    "border",
+    "relative w-[246px] h-[52px] shadow-lg",
+    "py-[6px] px-[16px] rounded-[6px]",
+    "flex items-center gap-3",
+    "text-[14px] leading-5",
+    variantClasses[variant].container,
   ].join(" ");
 
-  const titleClass = "m-0 font-semibold text-sm text-[#2B2B2B]";
-  const descClass = "m-0 text-sm text-[#2B2B2B] opacity-90";
+  const contentClass = ["flex-1", variantClasses[variant].text].join(" ");
+
+  const titleClass = "m-0 font-semibold text-[14px]";
+  const descClass = "m-0 text-[14px] opacity-90 mt-0.5";
+
+  useEffect(() => {
+    if (!duration || duration <= 0) return;
+
+    const timer = setTimeout(() => {
+      if (onClose) {
+        onClose();
+      }
+    }, duration);
+
+    return () => clearTimeout(timer);
+  }, [duration, onClose]);
 
   return (
-    <div className="relative" style={{ fontFamily: "'IBM Plex Sans Thai'" }}>
+    <div
+      className="fixed top-[5px] right-[8px] z-50"
+      style={{ fontFamily: "'IBM Plex Sans Thai'" }}
+    >
       <div className={containerClass} role="status" aria-live="polite">
-        {title ? <h4 className={titleClass}>{title}</h4> : null}
-        {description ? <p className={descClass}>{description}</p> : null}
-      </div>
+        {/* Icon */}
+        <div className="flex-shrink-0 mt-0.5">
+          {variant === "success" ? (
+            <img src="/check-circle.svg" width={20} height={20} alt="success" />
+          ) : variant === "error" ? (
+            <img src="/CloseFilled.svg" width={20} height={20} alt="error" />
+          ) : (
+            <img src="/check-circle.svg" width={20} height={20} alt="info" />
+          )}
+        </div>
 
-      {onClose ? (
-        <button
-          aria-label="close-toast"
-          onClick={onClose}
-          className="absolute top-2 right-2 p-1 text-[#2B2B2B] bg-transparent border-0 cursor-pointer"
-        >
-          ×
-        </button>
-      ) : null}
+        {/* Content */}
+        <div className={contentClass}>
+          {title ? <h4 className={titleClass}>{title}</h4> : null}
+          {description ? <p className={descClass}>{description}</p> : null}
+        </div>
+
+        {/* Close Button */}
+        {onClose ? (
+          <button
+            aria-label="close-toast"
+            onClick={onClose}
+            className="ml-2 mt-0.5 p-1 rounded-full opacity-90 hover:opacity-100 transition-colors"
+            style={{
+              background: "transparent",
+              border: 0,
+              color: "rgba(255,255,255,0.9)",
+            }}
+          >
+            <span style={{ fontSize: 18, lineHeight: 1 }} aria-hidden>
+              ×
+            </span>
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }
 
+export const CustomToast_Notification = {
+  create: (description?: string) => {
+    showToast({
+      title: "",
+      description: description || "Create successfully",
+      variant: "success",
+    });
+    console.log("Create successfully");
+  },
+  delete: (description?: string) => {
+    showToast({
+      title: "",
+      description: description || "Delete successfully",
+      variant: "success",
+    });
+    console.log("Delete successfully");
+  },
+};
+
 export default CustomToast;
+
+type ToastPayload = {
+  title?: string;
+  description?: string;
+  variant?: "default" | "success" | "error";
+};
+
+function showToast(payload: ToastPayload, duration = 3000) {
+  if (typeof document === "undefined") return;
+
+  const container = document.createElement("div");
+  document.body.appendChild(container);
+
+  const root = createRoot(container);
+
+  const cleanup = () => {
+    try {
+      root.unmount();
+    } catch (e) {}
+    if (container.parentNode) container.parentNode.removeChild(container);
+  };
+
+  root.render(
+    <CustomToast
+      title={payload.title}
+      description={payload.description}
+      variant={payload.variant}
+      onClose={cleanup}
+      duration={duration}
+    />
+  );
+
+  if (duration && duration > 0) {
+    setTimeout(cleanup, duration + 100);
+  }
+}

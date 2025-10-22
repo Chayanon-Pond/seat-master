@@ -10,7 +10,10 @@ import React, {
   useCallback,
 } from "react";
 import { Concert } from "../types";
-import { CustomToast } from "@/components/ui/CustomToast";
+import {
+  CustomToast,
+  CustomToast_Notification,
+} from "@/components/ui/CustomToast";
 import ConfirmModal from "@/components/ConfirmModal";
 
 interface PaginationData {
@@ -39,6 +42,7 @@ export const ConcertProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<string | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [concertToDelete, setConcertToDelete] = useState<string | null>(null);
+  const [concertNameToDelete, setConcertNameToDelete] = useState<string>("");
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,20 +58,18 @@ export const ConcertProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/admin/concerts`
-      );
+      const response = await fetch(`http://localhost:5000/api/admin/concerts`);
       if (!response.ok) {
         throw new Error(`Failed to fetch concerts: ${response.statusText}`);
       }
       const allData = await response.json();
       const totalPages = Math.ceil(allData.length / concertPerPage);
-      
+
       // Get concerts for current page
       const startIndex = (currentPage - 1) * concertPerPage;
       const endIndex = startIndex + concertPerPage;
       const paginatedConcerts = allData.slice(startIndex, endIndex);
-      
+
       setConcerts(paginatedConcerts);
       setPagination({
         totalItems: allData.length,
@@ -87,14 +89,15 @@ export const ConcertProvider = ({ children }: { children: ReactNode }) => {
     fetchConcerts();
   }, [fetchConcerts]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [concertToDelete]);
-
-  const handleDeleteConcert = useCallback((id: string) => {
-    setConcertToDelete(id);
-    setIsConfirmOpen(true);
-  }, []);
+  const handleDeleteConcert = useCallback(
+    (id: string) => {
+      const concertToRemove = concerts.find((c) => c.id === id);
+      setConcertToDelete(id);
+      setConcertNameToDelete(concertToRemove?.name || "Concert");
+      setIsConfirmOpen(true);
+    },
+    [concerts]
+  );
 
   const [toast, setToast] = useState<{
     title?: string;
@@ -121,8 +124,7 @@ export const ConcertProvider = ({ children }: { children: ReactNode }) => {
       setIsConfirmOpen(false);
       setConcertToDelete(null);
       setToast({
-        title: "Deleted",
-        description: "Concert deleted successfully",
+        description: "Delete successfully",
         variant: "success",
       });
     } catch (error) {
@@ -163,6 +165,10 @@ export const ConcertProvider = ({ children }: { children: ReactNode }) => {
       {children}
       <ConfirmModal
         isOpen={isConfirmOpen}
+        title="Are you sure you want to delete?"
+        message={`You are about to delete "${concertNameToDelete}". This action cannot be undone.`}
+        confirmLabel="Yes, Delete"
+        cancelLabel="Cancel"
         onConfirm={confirmDelete}
         onCancel={() => setIsConfirmOpen(false)}
       />

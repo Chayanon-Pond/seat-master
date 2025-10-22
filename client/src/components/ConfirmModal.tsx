@@ -25,7 +25,10 @@ export default function ConfirmModal({
   // ปิด modal เมื่อคลิกข้างนอก
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
         onCancel();
       }
     };
@@ -48,23 +51,13 @@ export default function ConfirmModal({
       role="dialog"
       aria-modal="true"
     >
-      <div ref={modalRef} className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6"
+      >
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-red-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+          <div className="w-12 h-12 rounded-full flex items-center justify-center">
+            <img src="/VectorX.svg" alt="close" className="w-12 h-12" />
           </div>
 
           <h3 className="text-lg font-semibold text-center">{title}</h3>
@@ -76,14 +69,15 @@ export default function ConfirmModal({
           <div className="w-full flex items-center justify-center gap-4 mt-2">
             <button
               onClick={onCancel}
-              className="px-4 py-2 rounded bg-white border text-sm text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 rounded bg-white border text-sm text-gray-700 hover:bg-gray-200 cursor-pointer"
             >
               {cancelLabel}
             </button>
 
             <button
               onClick={onConfirm}
-              className="px-4 py-2 rounded bg-red-500 text-white text-sm hover:bg-red-600"
+              style={{ backgroundColor: "var(--color-red)" }}
+              className="px-4 py-2 rounded text-white text-sm hover:opacity-80 cursor-pointer"
             >
               {confirmLabel}
             </button>
