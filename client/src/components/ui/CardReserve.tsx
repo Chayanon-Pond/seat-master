@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { FiUser } from "react-icons/fi";
 
 type Props = {
   title: string;
@@ -21,7 +20,7 @@ export default function CardReserve({
   onCancel,
 }: Props) {
   return (
-    <div className="bg-white rounded-md shadow-sm border p-6 mb-6 w-[1120px] h-[375px] overflow-hidden flex flex-col">
+    <div className="bg-white rounded-md shadow-sm border border-[#C2C2C2] p-6 mb-6 w-[1120px] h-[375px] overflow-hidden flex flex-col">
       <div>
         <h3 className="text-[40px] text-[var(--color-light-blue)] font-semibold mb-3">
           {title}
@@ -32,11 +31,15 @@ export default function CardReserve({
         )}
       </div>
 
-      <div className="mt-auto">
+      <div className="mt-16">
         <div className="flex flex-row items-center gap-4 justify-between">
           <div className="flex items-center text-gray-600">
             <div className="flex items-center gap-2 text-gray-600">
-              <FiUser size={20} />
+              <img
+                src="/user-back.svg"
+                alt="people"
+                className="w-6 h-6 opacity-80"
+              />
               <span className="text-[24px] font-medium">
                 {seats.toLocaleString()}
               </span>
@@ -45,7 +48,8 @@ export default function CardReserve({
           {reserved ? (
             <button
               onClick={onCancel}
-              className="bg-red-400 text-white px-4 py-2 rounded-md hover:opacity-90 cursor-pointer text-[24px]"
+              className="apply text-white px-4 py-2 rounded-md hover:opacity-90 cursor-pointer text-[24px]"
+              style={{ backgroundColor: "#F96464" }}
             >
               Cancel
             </button>

@@ -23,10 +23,8 @@ export default function Seatmaster({
       (s, c) => s + (c.seat ?? c.available_seats ?? 0),
       0
     );
-    const reserve =
-      concerts.reduce((r, c) => r + (c.reserved_seats ?? 0), 0) || 120;
-    const cancel =
-      concerts.reduce((r, c) => r + (c.cancelled_seats ?? 0), 0) || 12;
+    const reserve = concerts.reduce((r, c) => r + (c.reserved_seats ?? 0), 0);
+    const cancel = concerts.reduce((r, c) => r + (c.cancelled_seats ?? 0), 0);
     return { totalSeats, reserve, cancel };
   }, [concerts]);
 
@@ -104,10 +102,12 @@ export default function Seatmaster({
 
         {tab === "create" && (
           <div>
-            <ConcertCreate onCreateSuccess={() => {
-              fetchConcerts();
-              handleTabChange("overview");
-            }} />
+            <ConcertCreate
+              onCreateSuccess={() => {
+                fetchConcerts();
+                handleTabChange("overview");
+              }}
+            />
           </div>
         )}
       </div>

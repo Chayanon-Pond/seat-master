@@ -26,6 +26,11 @@ interface ReserveContextType {
   currentPage: number;
   totalPages: number;
   setCurrentPage: (page: number) => void;
+  // reservation UI state and actions
+  reservedMap?: Record<string, boolean>;
+  ensureConcerts?: (ids: string[]) => void;
+  reserve?: (concertId: string) => Promise<boolean>;
+  cancel?: (concertId: string) => Promise<boolean>;
 }
 
 const ReserveContext = createContext<ReserveContextType | undefined>(undefined);
@@ -34,6 +39,59 @@ export const ReserveProvider = ({ children }: { children: ReactNode }) => {
   const [reserves, setReserves] = useState<Reserve[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const [reservedMap, setReservedMap] = useState<Record<string, boolean>>(() => {
+    try {
+      const raw = typeof window !== "undefined" ? localStorage.getItem("reservedMap") : null;
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      console.warn("Failed to read reservedMap from localStorage", e);
+      return {};
+    }
+  });
+  const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
+
+  const ensureConcerts = useCallback((ids: string[]) => {
+    setReservedMap((m) => {
+      const copy = { ...m };
+      for (const id of ids) {
+        if (typeof copy[id] === "undefined") copy[id] = false;
+      }
+      return copy;
+    });
+  }, []);
+
+  const reserve = useCallback(async (concertId: string) => {
+    try {
+      const res = await fetch(`${BACKEND}/api/admin/history-create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ concert_id: concertId, username: "user", action: "Reserved" }),
+      });
+      if (!res.ok) throw new Error(`status:${res.status}`);
+  setReservedMap((m) => ({ ...m, [concertId]: true }));
+      return true;
+    } catch (err) {
+      console.error("reserve failed", err);
+      return false;
+    }
+  }, []);
+
+  const cancel = useCallback(async (concertId: string) => {
+    try {
+      const res = await fetch(`${BACKEND}/api/admin/history-create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ concert_id: concertId, username: "user", action: "Cancelled" }),
+      });
+      if (!res.ok) throw new Error(`status:${res.status}`);
+  setReservedMap((m) => ({ ...m, [concertId]: false }));
+      return true;
+    } catch (err) {
+      console.error("cancel failed", err);
+      return false;
+    }
+  }, []);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -49,7 +107,8 @@ export const ReserveProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/reserves`);
+      const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
+      const response = await fetch(`${BACKEND}/api/admin/concerts`);
       if (!response.ok) {
         throw new Error("Failed to fetch reserves");
       }
@@ -92,6 +151,10 @@ export const ReserveProvider = ({ children }: { children: ReactNode }) => {
       error,
       fetchReserves,
       setCurrentPage,
+      reservedMap,
+      ensureConcerts,
+      reserve,
+      cancel,
     }),
     [
       reserves,
@@ -101,8 +164,21 @@ export const ReserveProvider = ({ children }: { children: ReactNode }) => {
       error,
       fetchReserves,
       setCurrentPage,
+      reservedMap,
+      ensureConcerts,
+      reserve,
+      cancel,
     ]
   );
+  useEffect(() => {
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("reservedMap", JSON.stringify(reservedMap));
+      }
+    } catch (e) {
+      console.warn("Failed to persist reservedMap to localStorage", e);
+    }
+  }, [reservedMap]);
 
   return (
     <ReserveContext.Provider value={value}>{children}</ReserveContext.Provider>

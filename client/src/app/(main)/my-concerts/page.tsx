@@ -1,22 +1,23 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ConcertCard from "../../../components/ui/CardReserve";
 import useConcert from "../../admin/hooks/useConcert";
 import Pagination from "../../admin/components/Pagination";
 import { CustomToast_Notification } from "../../../components/ui/CustomToast";
+import { useReserveContext } from "../../../context/reserveContext";
+import ConfirmModal from "../../../components/ConfirmModal";
 
 function MyConcertsPage() {
   const { concerts, loading, error } = useConcert();
 
-  const handleReserve = useCallback((concertId: string) => {
-    // Placeholder: show toast. Replace with real reserve API call when backend exists.
-    CustomToast_Notification.create("Reserved successfully");
-    console.log("Reserve clicked for", concertId);
-  }, []);
+  const reserveContext = useReserveContext();
+  const { reservedMap, ensureConcerts, reserve, cancel } = reserveContext;
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [selectedCancelId, setSelectedCancelId] = useState<string | null>(null);
 
   const totalPages = Math.max(1, Math.ceil(concerts.length / itemsPerPage));
 
@@ -28,6 +29,10 @@ function MyConcertsPage() {
     const start = (currentPage - 1) * itemsPerPage;
     return concerts.slice(start, start + itemsPerPage);
   }, [concerts, currentPage]);
+
+  useEffect(() => {
+    ensureConcerts?.(paginated.map((c) => c.id));
+  }, [paginated, ensureConcerts]);
 
   return (
     <div className=" mx-auto px-4 py-6">
@@ -45,8 +50,16 @@ function MyConcertsPage() {
               title={c.name}
               description={c.description}
               seats={c.available_seats ?? c.seat}
-              reserved={false}
-              onReserve={() => handleReserve(c.id)}
+              reserved={!!reservedMap?.[c.id]}
+              onReserve={async () => {
+                const ok = await reserve?.(c.id);
+                if (ok)
+                  CustomToast_Notification.create("Reserved successfully");
+              }}
+              onCancel={async () => {
+                setSelectedCancelId(c.id);
+                setConfirmOpen(true);
+              }}
             />
           </div>
         ))}
@@ -63,6 +76,26 @@ function MyConcertsPage() {
           onPageChange={(p) => setCurrentPage(p)}
         />
       </div>
+
+      <ConfirmModal
+        isOpen={confirmOpen}
+        title="Confirm cancellation"
+        message="Are you sure you want to cancel this reservation?"
+        confirmLabel="Yes, Cancel"
+        cancelLabel="No"
+        onCancel={() => {
+          setConfirmOpen(false);
+          setSelectedCancelId(null);
+        }}
+        onConfirm={async () => {
+          if (selectedCancelId) {
+            const ok = await cancel?.(selectedCancelId);
+            if (ok) CustomToast_Notification.create("Cancelled successfully");
+          }
+          setConfirmOpen(false);
+          setSelectedCancelId(null);
+        }}
+      />
     </div>
   );
 }
