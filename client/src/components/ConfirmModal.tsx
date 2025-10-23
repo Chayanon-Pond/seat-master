@@ -19,7 +19,6 @@ export default function ConfirmModal({
   onConfirm,
   onCancel,
 }: ConfirmModalProps) {
-  if (!isOpen) return null;
   const modalRef = useRef<HTMLDivElement | null>(null);
 
   // ปิด modal เมื่อคลิกข้างนอก
@@ -44,6 +43,8 @@ export default function ConfirmModal({
     if (isOpen) document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onCancel]);
+
+  if (!isOpen) return null;
 
   return (
     <div
@@ -75,14 +76,20 @@ export default function ConfirmModal({
             <button
               onClick={onCancel}
               className="w-full sm:w-[179px] h-[44px] sm:h-[48px] rounded bg-white border text-[14px] sm:text-[16px] text-black hover:bg-gray-200 cursor-pointer flex items-center justify-center"
-              style={{ borderColor: "#C4C4C4", fontFamily: "var(--font-ibm-thai)" }}
+              style={{
+                borderColor: "#C4C4C4",
+                fontFamily: "var(--font-ibm-thai)",
+              }}
             >
               {cancelLabel}
             </button>
 
             <button
               onClick={onConfirm}
-              style={{ backgroundColor: "var(--color-red)", fontFamily: "var(--font-ibm-thai)" }}
+              style={{
+                backgroundColor: "var(--color-red)",
+                fontFamily: "var(--font-ibm-thai)",
+              }}
               className="w-full sm:w-[179px] h-[44px] sm:h-[48px] rounded text-white text-[14px] sm:text-[16px] hover:opacity-80 cursor-pointer flex items-center justify-center"
             >
               {confirmLabel}

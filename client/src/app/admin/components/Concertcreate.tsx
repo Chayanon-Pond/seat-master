@@ -7,7 +7,7 @@ import { CustomToast } from "@/components/ui/CustomToast";
 export default function ConcertCreate({
   onCreateSuccess,
 }: {
-  onCreateSuccess?: () => void;
+  onCreateSuccess?: (id?: string) => void;
 }) {
   const {
     formData,
@@ -28,7 +28,7 @@ export default function ConcertCreate({
             </h2>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 lg:mt-5">
             {/* Concert Name and Total Seats Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>

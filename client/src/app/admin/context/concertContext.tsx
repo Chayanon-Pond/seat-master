@@ -175,7 +175,7 @@ export const ConcertProvider = ({ children }: { children: ReactNode }) => {
               color: "#171717",
             }}
           >
-            "{concertNameToDelete}"
+            {`"${concertNameToDelete}"`}
           </span>
         }
         confirmLabel="Yes, Delete"

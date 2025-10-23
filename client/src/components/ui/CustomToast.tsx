@@ -147,12 +147,14 @@ function showToast(payload: ToastPayload, duration = 3000) {
     document.body.appendChild(container);
   }
 
-  let root = (container as any).__react_toast_root as
-    | ReturnType<typeof createRoot>
-    | undefined;
+  // store react root on container element using a typed property to avoid `any`
+  type ToastRoot = ReturnType<typeof createRoot>;
+  type ToastContainerEl = HTMLElement & { __seat_master_toast_root__?: ToastRoot };
+  const containerEl = container as ToastContainerEl;
+  let root = containerEl.__seat_master_toast_root__;
   if (!root) {
-    root = createRoot(container);
-    (container as any).__react_toast_root = root;
+    root = createRoot(containerEl);
+    containerEl.__seat_master_toast_root__ = root;
   }
 
   const renderToast = (visible: boolean) => {
@@ -169,8 +171,8 @@ function showToast(payload: ToastPayload, duration = 3000) {
     } else {
       try {
         root!.render(<div />);
-      } catch (e) {
-        console.error("Failed to unmount toast", e);
+      } catch (err) {
+        console.error("Failed to unmount toast", err);
       }
     }
   };

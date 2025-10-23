@@ -17,8 +17,9 @@ export default function useBooking() {
       if (!res.ok) throw new Error(`status:${res.status}`);
       const data = await res.json();
       setStats({ reserved: Number(data.reserved ?? 0), cancelled: Number(data.cancelled ?? 0) });
-    } catch (err: any) {
-      setError(err?.message || "Failed to fetch bookings stats");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err ?? "Failed to fetch bookings stats");
+      setError(msg);
       setStats(null);
     } finally {
       setLoading(false);
