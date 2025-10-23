@@ -19,15 +19,17 @@ export default function Cardconcerts({ concert, onDelete }: CardProps) {
       style={{ borderColor: "var(--color-border-light)" }}
     >
       <div className="flex-1">
-        <h3 className="text-blue-600 font-semibold text-lg">{title}</h3>
+        <h3 className="text-[var(--color-light-blue)] font-semibold text-[40px]">
+          {title}
+        </h3>
         <hr className="my-3 border-t border-gray-200" />
-        <p className="text-sm text-gray-600">{description}</p>
+        <p className="text-[24px] text-gray-600">{description}</p>
       </div>
 
       <div className="flex flex-row items-center gap-4 justify-between">
         <div className="flex items-center gap-2 text-gray-600">
           <FiUser size={20} />
-          <span className="text-sm">{seats}</span>
+          <span className="text-[24px]">{seats}</span>
         </div>
 
         <button
@@ -37,7 +39,7 @@ export default function Cardconcerts({ concert, onDelete }: CardProps) {
             backgroundColor: "var(--color-red)",
           }}
         >
-          <FiTrash2 size={16} /> Delete
+          <FiTrash2 size={20} /> Delete
         </button>
       </div>
     </div>

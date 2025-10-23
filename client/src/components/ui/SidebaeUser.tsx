@@ -11,26 +11,14 @@ type SidebarItemDef = {
   icon: string | React.ElementType;
 };
 
-export default function Sidebar() {
+export default function SidebarUser() {
   const pathname = usePathname();
 
   const sidebarItems: SidebarItemDef[] = [
     {
-      id: "home",
-      name: "Home",
-      path: "/admin/dashboard",
-      icon: "/home.svg",
-    },
-    {
-      id: "history",
-      name: "History",
-      path: "/admin/dashboard/historys",
-      icon: "/inbox.svg",
-    },
-    {
       id: "switch-to-user",
-      name: "Switch to user",
-      path: "/my-concerts",
+      name: "Switch to Admin",
+      path: "/admin/dashboard",
       icon: "/refresh-ccw.svg",
     },
   ];
@@ -44,7 +32,7 @@ export default function Sidebar() {
             className="text-[40px] font-semibold text-black w-full text-right"
             style={{ WebkitBackgroundClip: "text" }}
           >
-            Admin
+            User
           </Link>
         </div>
       </div>
