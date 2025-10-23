@@ -167,7 +167,14 @@ export const ConcertProvider = ({ children }: { children: ReactNode }) => {
         isOpen={isConfirmOpen}
         title="Are you sure you want to delete?"
         message={
-          <span style={{ fontFamily: "var(--font-ibm-thai)", fontSize: 20, fontWeight: 700, color: '#171717' }}>
+          <span
+            style={{
+              fontFamily: "var(--font-ibm-thai)",
+              fontSize: 20,
+              fontWeight: 700,
+              color: "#171717",
+            }}
+          >
             "{concertNameToDelete}"
           </span>
         }

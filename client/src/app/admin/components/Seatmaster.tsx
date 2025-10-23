@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import Cardconcerts from "./Cardconcerts";
 import ConcertCreate from "./Concertcreate";
+import useBooking from "../../../hook/useBooking";
 import { useConcertsContext } from "../context/concertContext";
 
 export default function Seatmaster({
@@ -28,34 +29,48 @@ export default function Seatmaster({
     return { totalSeats, reserve, cancel };
   }, [concerts]);
 
+  const { stats } = useBooking();
+
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6 md:p-6">
       {/* Stats cards */}
       <div className="flex flex-col sm:flex-row sm:space-x-2.5 gap-4 mb-6">
-        <div className="rounded-[8px] w-[350px] h-[234px] px-4 py-6 bg-[var(--color-blue)] text-white flex flex-col items-center">
+        <div className="rounded-[8px] w-full sm:w-[350px] h-auto sm:h-[234px] px-4 py-6 bg-[var(--color-blue)] text-white flex flex-col items-center">
           <div className="w-10 h-10 rounded-full border border-white flex items-center justify-center mb-4">
-            <img src="/user.svg" alt="user" className="w-5 h-5" />
+            <img src="/user.svg" alt="user" className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div className="text-sm opacity-90">Total of seats</div>
-          <div className="text-[48px] font-semibold mt-4">
+          <div className="text-[12px] sm:text-sm opacity-90">
+            Total of seats
+          </div>
+          <div className="text-[28px] sm:text-[40px] md:text-[48px] font-semibold mt-4">
             {totals.totalSeats}
           </div>
         </div>
-
-        <div className="rounded-[8px] w-[350px] h-[234px] px-4 py-6 bg-[var(--color-teal)] text-white flex flex-col items-center">
+        <div className="rounded-[8px] w-full sm:w-[350px] h-auto sm:h-[234px] px-4 py-6 bg-[var(--color-teal)] text-white flex flex-col items-center">
           <div className="w-10 h-10 rounded-full border border-white flex items-center justify-center mb-4">
-            <img src="/award.svg" alt="award" className="w-5 h-5" />
+            <img
+              src="/award.svg"
+              alt="award"
+              className="w-4 h-4 sm:w-5 sm:h-5"
+            />
           </div>
-          <div className="text-sm opacity-90">Reserve</div>
-          <div className="text-[48px] font-semibold mt-4">{totals.reserve}</div>
+          <div className="text-[12px] sm:text-sm opacity-90">Reserve</div>
+          <div className="text-[28px] sm:text-[40px] md:text-[48px] font-semibold mt-4">
+            {stats ? stats.reserved : totals.reserve}
+          </div>
         </div>
-
-        <div className="rounded-[8px] w-[350px] h-[234px] px-4 py-6 bg-[var(--color-red)] text-white flex flex-col items-center">
+        <div className="rounded-[8px] w-full sm:w-[350px] h-auto sm:h-[234px] px-4 py-6 bg-[var(--color-red)] text-white flex flex-col items-center">
           <div className="w-10 h-10 rounded-full border border-white flex items-center justify-center mb-4">
-            <img src="/x-circle.svg" alt="x-circle" className="w-5 h-5" />
+            <img
+              src="/x-circle.svg"
+              alt="x-circle"
+              className="w-4 h-4 sm:w-5 sm:h-5"
+            />
           </div>
-          <div className="text-sm opacity-90">Cancel</div>
-          <div className="text-[48px] font-semibold mt-4">{totals.cancel}</div>
+          <div className="text-[12px] sm:text-sm opacity-90">Cancel</div>
+          <div className="text-[28px] sm:text-[40px] md:text-[48px] font-semibold mt-4">
+            {stats ? stats.cancelled : totals.cancel}
+          </div>
         </div>
       </div>
 
@@ -66,7 +81,7 @@ export default function Seatmaster({
             <button
               onClick={() => handleTabChange("overview")}
               style={{ fontFamily: "Roboto, sans-serif" }}
-              className={`text-[24px] font-semibold px-3 py-1  cursor-pointer ${
+              className={`text-[18px] sm:text-[20px] md:text-[24px] font-semibold px-3 py-1  cursor-pointer ${
                 tab === "overview"
                   ? "text-[var(--color-light-blue)] border-b-2 border-[var(--color-light-blue)] pb-1"
                   : "text-gray-600"
@@ -77,7 +92,7 @@ export default function Seatmaster({
             <button
               onClick={() => handleTabChange("create")}
               style={{ fontFamily: "Roboto, sans-serif" }}
-              className={`text-[24px] font-semibold px-3 py-1  cursor-pointer ${
+              className={`text-[18px] sm:text-[20px] md:text-[24px] font-semibold px-3 py-1  cursor-pointer ${
                 tab === "create"
                   ? "text-[var(--color-light-blue)] border-b-2 border-[var(--color-light-blue)] pb-1"
                   : "text-gray-600"

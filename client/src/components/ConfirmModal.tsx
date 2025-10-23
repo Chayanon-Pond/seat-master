@@ -53,8 +53,8 @@ export default function ConfirmModal({
     >
       <div
         ref={modalRef}
-        className="bg-white rounded-lg shadow-lg w-full max-w-[422px] h-[256px] p-6 flex items-center"
-        style={{ borderColor: "#C4C4C4", position: "absolute", top: "471px", left: "553px" }}
+        className="bg-white rounded-lg shadow-lg w-full max-w-[422px] h-auto lg:h-[256px] p-4 sm:p-6 flex items-center relative lg:absolute lg:top-[471px] lg:left-[553px]"
+        style={{ borderColor: "#C4C4C4" }}
       >
         <div className="flex flex-col items-center gap-2 w-full">
           <div className="w-12 h-12 rounded-full flex items-center justify-center">
@@ -71,10 +71,10 @@ export default function ConfirmModal({
             )
           ) : null}
 
-          <div className="w-full flex items-center justify-center gap-4 mt-2">
+          <div className="w-full flex flex-col sm:flex-row items-center sm:justify-center gap-3 mt-2">
             <button
               onClick={onCancel}
-              className="w-[179px] h-[48px] rounded bg-white border text-[16px] text-black hover:bg-gray-200 cursor-pointer flex items-center justify-center"
+              className="w-full sm:w-[179px] h-[44px] sm:h-[48px] rounded bg-white border text-[14px] sm:text-[16px] text-black hover:bg-gray-200 cursor-pointer flex items-center justify-center"
               style={{ borderColor: "#C4C4C4", fontFamily: "var(--font-ibm-thai)" }}
             >
               {cancelLabel}
@@ -83,7 +83,7 @@ export default function ConfirmModal({
             <button
               onClick={onConfirm}
               style={{ backgroundColor: "var(--color-red)", fontFamily: "var(--font-ibm-thai)" }}
-              className="w-[179px] h-[48px] rounded text-white text-[16px] hover:opacity-80 cursor-pointer flex items-center justify-center"
+              className="w-full sm:w-[179px] h-[44px] sm:h-[48px] rounded text-white text-[14px] sm:text-[16px] hover:opacity-80 cursor-pointer flex items-center justify-center"
             >
               {confirmLabel}
             </button>

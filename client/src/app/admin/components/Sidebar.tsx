@@ -1,26 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-type SidebarItemDef = {
-  id: string;
-  name: string;
-  path: string;
-  icon: string | React.ElementType;
-};
+type SidebarItemDef = { id: string; name: string; path: string; icon: string };
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const sidebarItems: SidebarItemDef[] = [
-    {
-      id: "home",
-      name: "Home",
-      path: "/admin/dashboard",
-      icon: "/home.svg",
-    },
+    { id: "home", name: "Home", path: "/admin/dashboard", icon: "/home.svg" },
     {
       id: "history",
       name: "History",
@@ -36,67 +27,118 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="bg-white w-[240px] h-screen shadow-md flex flex-col border-3 border-gray-200 border-b-0 border-t-0">
-      <div className="pt-15 pr-14 pb-2 flex flex-col items-center">
-        <div className="max-w-screen-xl h-full hidden sm:flex items-center justify-between lg:mx-[120px] mx-6 px-6">
+    <>
+      {/* Mobile header (visible on sm only) */}
+      <header className="w-full bg-white border-b border-gray-200 md:hidden">
+        <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link
             href="/admin/dashboard"
-            className="text-[40px] font-semibold text-black w-full text-right"
-            style={{ WebkitBackgroundClip: "text" }}
+            className="text-[28px] font-semibold text-black"
+          >
+            Admin
+          </Link>
+          <button
+            aria-label="Open menu"
+            onClick={() => setMobileOpen(true)}
+            className="p-1"
+          >
+            <img src="/hamburger.svg" alt="menu" className="w-6 h-6" />
+          </button>
+        </div>
+      </header>
+
+      {/* Sidebar: visible on md and lg (md narrower, lg original width) */}
+      <aside className="hidden md:flex bg-white md:w-[200px] lg:w-[240px] h-screen flex-col shadow-md">
+        <div className="px-6 pt-6">
+          <Link
+            href="/admin/dashboard"
+            className="text-[40px] font-semibold text-black"
           >
             Admin
           </Link>
         </div>
-      </div>
-      <nav className="flex flex-col py-4 flex-1">
-        {sidebarItems.map((item) => {
-          const isActive = pathname === item.path;
-          return (
-            <Link
-              href={item.path}
-              key={item.id}
-              passHref
-              legacyBehavior={false}
-            >
-              <div
-                className={`flex items-center px-5 py-3 mx-3 my-0.5 rounded-md cursor-pointer transition-colors duration-150 ease-in-out
-                    ${
-                      isActive
-                        ? "bg-[var(--color-sidebar-hover)] text-gray-800 font-normal"
-                        : "text-gray-600 hover:bg-[var(--color-sidebar-hover)] hover:text-gray-800"
-                    }`}
-              >
-                {typeof item.icon === "string" ? (
-                  <img
-                    src={item.icon}
-                    alt={`${item.name} icon`}
-                    className={`w-5 h-5 mr-3 object-contain ${
-                      isActive ? "opacity-100" : "opacity-70"
-                    }`}
-                  />
-                ) : (
-                  <item.icon
-                    className={`w-5 h-5 mr-3 ${
-                      isActive ? "text-gray-700" : "text-gray-400"
-                    }`}
-                  />
-                )}
-                <span>{item.name}</span>
-              </div>
-            </Link>
-          );
-        })}
-      </nav>
-      <div className="mb-10">
-        <button className="flex items-center px-5 py-3 mx-3 my-0.5 rounded-md cursor-pointer transition-colors duration-150 ease-in-out text-gray-600 hover:bg-[var(--color-sidebar-hover)] hover:text-gray-800">
-          <img
-            src="/log-out.svg"
-            alt="Log out"
-            className="w-5 h-5 mr-3 object-contain opacity-70"
+
+        <nav className="flex-1 py-4">
+          {sidebarItems.map((it) => {
+            const isActive = pathname === it.path;
+            return (
+              <Link href={it.path} key={it.id}>
+                <div
+                  className={`flex items-center px-5 py-3 mx-3 my-0.5 rounded-md cursor-pointer ${
+                    isActive
+                      ? "bg-[var(--color-sidebar-hover)] text-gray-800"
+                      : "text-gray-600 hover:bg-[var(--color-sidebar-hover)]"
+                  }`}
+                >
+                  <img src={it.icon} alt={it.name} className="w-5 h-5 mr-3" />
+                  <span>{it.name}</span>
+                </div>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="p-4">
+          <button className="flex items-center w-full text-gray-600 hover:bg-[var(--color-sidebar-hover)] px-4 py-2 rounded cursor-pointer">
+            <img src="/log-out.svg" alt="Log out" className="w-5 h-5 mr-3" />
+            <span>Log out</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Mobile full-screen overlay (menu stacked vertically, sm only) */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setMobileOpen(false)}
           />
-          <span>Log out</span>
-        </button>
-      </div>
-    </div>
+
+          <div className="absolute inset-0 flex">
+            <div className="w-full bg-white overflow-auto">
+              <div className="p-4 border-b flex items-center justify-between">
+                <Link
+                  href="/admin/dashboard"
+                  className="text-[28px] font-semibold text-black"
+                >
+                  Admin
+                </Link>
+                <button
+                  aria-label="Close menu"
+                  onClick={() => setMobileOpen(false)}
+                  className="p-1"
+                >
+                  <img src="/hamburger.svg" alt="close" className="w-6 h-6" />
+                </button>
+              </div>
+
+              <nav className="flex flex-col gap-4 p-6 pl-2">
+                {sidebarItems.map((it) => (
+                  <Link href={it.path} key={it.id}>
+                    <div
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-4 px-2 py-3 rounded cursor-pointer text-gray-600 hover:bg-[var(--color-sidebar-hover)]"
+                    >
+                      <img src={it.icon} alt={it.name} className="w-6 h-6" />
+                      <span className="text-[16px]">{it.name}</span>
+                    </div>
+                  </Link>
+                ))}
+
+                <div className="pt-4 mt-4">
+                  <button
+                    className="flex items-center gap-4 text-gray-600 hover:bg-[var(--color-sidebar-hover)] px-2 py-3 rounded w-full ml-1"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <img src="/log-out.svg" alt="Log out" className="w-6 h-6" />
+                    <span>Log out</span>
+                  </button>
+                </div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

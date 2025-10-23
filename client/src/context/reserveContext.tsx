@@ -63,13 +63,36 @@ export const ReserveProvider = ({ children }: { children: ReactNode }) => {
 
   const reserve = useCallback(async (concertId: string) => {
     try {
-      const res = await fetch(`${BACKEND}/api/admin/history-create`, {
+      // First create a booking (this inserts into the `bookings` table)
+      const res = await fetch(`${BACKEND}/api/admin/bookings-create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ concert_id: concertId, username: "user", action: "Reserved" }),
+        body: JSON.stringify({ concert_id: concertId, status: "reserved" }),
       });
-      if (!res.ok) throw new Error(`status:${res.status}`);
-  setReservedMap((m) => ({ ...m, [concertId]: true }));
+      if (!res.ok) throw new Error(`bookings-create status:${res.status}`);
+
+      // also post a history record for admin UI (keep existing behaviour)
+      try {
+        await fetch(`${BACKEND}/api/admin/history-create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ concert_id: concertId, username: "user", action: "Reserved" }),
+        });
+      } catch (e) {
+        // don't block success if history logging fails
+        console.warn('history-create failed (non-blocking):', e);
+      }
+
+      setReservedMap((m) => ({ ...m, [concertId]: true }));
+
+      // notify other tabs (admin dashboard) to refresh concerts
+      try {
+        const bc = new BroadcastChannel("seat-master:concerts");
+        bc.postMessage({ type: "concerts-updated", concertId, action: "Reserved" });
+        bc.close();
+      } catch (e) {
+        // BroadcastChannel may not be available in all environments
+      }
       return true;
     } catch (err) {
       console.error("reserve failed", err);
@@ -79,13 +102,34 @@ export const ReserveProvider = ({ children }: { children: ReactNode }) => {
 
   const cancel = useCallback(async (concertId: string) => {
     try {
-      const res = await fetch(`${BACKEND}/api/admin/history-create`, {
+      // mark booking as cancelled
+      const res = await fetch(`${BACKEND}/api/admin/bookings-create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ concert_id: concertId, username: "user", action: "Cancelled" }),
+        body: JSON.stringify({ concert_id: concertId, status: "cancelled" }),
       });
-      if (!res.ok) throw new Error(`status:${res.status}`);
-  setReservedMap((m) => ({ ...m, [concertId]: false }));
+      if (!res.ok) throw new Error(`bookings-create status:${res.status}`);
+
+      // still log history for admin
+      try {
+        await fetch(`${BACKEND}/api/admin/history-create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ concert_id: concertId, username: "user", action: "Cancelled" }),
+        });
+      } catch (e) {
+        console.warn('history-create failed (non-blocking):', e);
+      }
+
+      setReservedMap((m) => ({ ...m, [concertId]: false }));
+      // notify other tabs (admin dashboard) to refresh concerts
+      try {
+        const bc = new BroadcastChannel("seat-master:concerts");
+        bc.postMessage({ type: "concerts-updated", concertId, action: "Cancelled" });
+        bc.close();
+      } catch (e) {
+        // ignore
+      }
       return true;
     } catch (err) {
       console.error("cancel failed", err);

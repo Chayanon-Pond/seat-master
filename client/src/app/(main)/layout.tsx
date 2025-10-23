@@ -11,11 +11,17 @@ export default function MainLayout({
 }) {
   return (
     <ReserveProvider>
-      <div className="flex">
-        <div className="fixed">
+      <div className="flex flex-col lg:flex-row">
+        {/* Mobile header/navbar (renders Sidebar's mobile header because Sidebar contains lg:hidden header) */}
+        <div className="w-full lg:hidden">
           <SidebarUser />
         </div>
-        <main className="flex-1 bg-gray-50 min-h-screen ml-[240px]">
+        {/* Desktop fixed sidebar */}
+        <div className="fixed lg:block hidden">
+          <SidebarUser />
+        </div>
+
+        <main className="flex-1 bg-gray-50 min-h-screen lg:ml-[240px]">
           {children}
         </main>
       </div>

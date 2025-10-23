@@ -30,17 +30,23 @@ export function CustomToast({
   };
 
   const containerClass = [
-    "relative w-[246px] h-[52px] shadow-lg",
-    "py-[6px] px-[16px] rounded-[6px]",
+    // mobile first: narrower and shorter
+    "relative w-[200px] h-[48px] shadow-lg",
+    "py-[6px] px-[12px] rounded-[6px]",
     "flex items-center gap-3",
-    "text-[14px] leading-5",
+    "text-[12px] leading-5",
+    // sm/md adjustments
+    "sm:w-[246px] sm:h-[52px] sm:py-[6px] sm:px-[16px] sm:text-[14px]",
+    "md:w-[320px] md:h-[60px] md:text-[14px]",
+    // keep desktop as before
+    "lg:w-[246px] lg:h-[52px]",
     variantClasses[variant].container,
   ].join(" ");
 
   const contentClass = ["flex-1", variantClasses[variant].text].join(" ");
 
-  const titleClass = "m-0 font-semibold text-[14px]";
-  const descClass = "m-0 text-[14px] opacity-90 mt-0.5";
+  const titleClass = "m-0 font-semibold text-[12px] sm:text-[14px]";
+  const descClass = "m-0 text-[12px] sm:text-[14px] opacity-90 mt-0.5";
 
   useEffect(() => {
     if (!duration || duration <= 0) return;

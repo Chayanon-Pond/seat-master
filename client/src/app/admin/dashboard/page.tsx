@@ -42,7 +42,21 @@ function DashboardContent() {
   return (
     <div className="bg-gray-100 flex flex-col flex-1 min-h-screen">
       <div>
-        <Seatmaster onTabChange={setActiveTab} />
+        {activeTab === "create" ? (
+          // Small/medium: centered card wrapper; Desktop: render unwrapped to preserve original layout
+          <>
+            <div className="lg:hidden w-full sm:max-w-[680px] sm:mx-auto sm:bg-white sm:rounded-lg sm:border sm:border-gray-200 sm:p-4 md:p-6">
+              <Seatmaster onTabChange={setActiveTab} />
+            </div>
+            <div className="hidden lg:block">
+              <Seatmaster onTabChange={setActiveTab} />
+            </div>
+          </>
+        ) : (
+          <div>
+            <Seatmaster onTabChange={setActiveTab} />
+          </div>
+        )}
       </div>
       <div>
         {!isLoading && !error && concerts.length === 0 && (
