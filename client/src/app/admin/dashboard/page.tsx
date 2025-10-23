@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, Suspense, use } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Seatmaster from "../components/Seatmaster";
 import Pagination from "../components/Pagination";
@@ -16,10 +16,11 @@ function DashboardContent() {
     currentPage,
     totalPages,
     fetchConcerts,
-    handleDeleteConcert,
     setCurrentPage,
   } = useConcertsContext();
-  const [activeTab, setActiveTab] = React.useState<"overview" | "create">("overview");
+  const [activeTab, setActiveTab] = React.useState<"overview" | "create">(
+    "overview"
+  );
 
   useEffect(() => {
     const shouldRefetch = searchParams.get("refetch") === "true";
@@ -37,28 +38,6 @@ function DashboardContent() {
     [router]
   );
 
-  const handleCreateConcert = useCallback(() => {
-    router.push("/admin/dashboard/create");
-  }, [router]);
-
-  const formatDate = useCallback((dateString: string): string => {
-    if (!dateString) return "N/A";
-    try {
-      const date = new Date(dateString);
-      return `${date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      })} ${date.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      })}`;
-    } catch (e) {
-      console.error("Error formatting date:", dateString, e);
-      return dateString;
-    }
-  }, []);
 
   return (
     <div className="bg-gray-100 flex flex-col flex-1 min-h-screen">

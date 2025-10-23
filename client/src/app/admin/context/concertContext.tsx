@@ -166,7 +166,11 @@ export const ConcertProvider = ({ children }: { children: ReactNode }) => {
       <ConfirmModal
         isOpen={isConfirmOpen}
         title="Are you sure you want to delete?"
-        message={`You are about to delete "${concertNameToDelete}". This action cannot be undone.`}
+        message={
+          <span style={{ fontFamily: "var(--font-ibm-thai)", fontSize: 20, fontWeight: 700, color: '#171717' }}>
+            "{concertNameToDelete}"
+          </span>
+        }
         confirmLabel="Yes, Delete"
         cancelLabel="Cancel"
         onConfirm={confirmDelete}

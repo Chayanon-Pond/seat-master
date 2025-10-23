@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -23,8 +25,8 @@ export function CustomToast({
       container: "bg-[var(--background)] border-[rgba(0,0,0,0.04)]",
       text: "text-white",
     },
-    success: { container: "bg-[var(--background)]", text: "text-white" },
-    error: { container: "bg-[var(--background)]", text: "text-white" },
+    success: { container: "bg-[var(--background)]", text: "text-black" },
+    error: { container: "bg-[var(--background)]", text: "text-black" },
   };
 
   const containerClass = [
@@ -87,9 +89,13 @@ export function CustomToast({
               color: "rgba(255,255,255,0.9)",
             }}
           >
-            <span style={{ fontSize: 18, lineHeight: 1 }} aria-hidden>
-              ×
-            </span>
+            <img
+              src="/Vectortoast.svg"
+              alt="close"
+              width={11}
+              height={11}
+              aria-hidden
+            />
           </button>
         ) : null}
       </div>
@@ -127,29 +133,44 @@ type ToastPayload = {
 function showToast(payload: ToastPayload, duration = 3000) {
   if (typeof document === "undefined") return;
 
-  const container = document.createElement("div");
-  document.body.appendChild(container);
+  const ROOT_ID = "__seat_master_toast_root__";
+  let container = document.getElementById(ROOT_ID) as HTMLElement | null;
+  if (!container) {
+    container = document.createElement("div");
+    container.id = ROOT_ID;
+    document.body.appendChild(container);
+  }
 
-  const root = createRoot(container);
+  let root = (container as any).__react_toast_root as
+    | ReturnType<typeof createRoot>
+    | undefined;
+  if (!root) {
+    root = createRoot(container);
+    (container as any).__react_toast_root = root;
+  }
 
-  const cleanup = () => {
-    try {
-      root.unmount();
-    } catch (e) {}
-    if (container.parentNode) container.parentNode.removeChild(container);
+  const renderToast = (visible: boolean) => {
+    if (visible) {
+      root!.render(
+        <CustomToast
+          title={payload.title}
+          description={payload.description}
+          variant={payload.variant}
+          onClose={() => renderToast(false)}
+          duration={duration}
+        />
+      );
+    } else {
+      try {
+        root!.render(<div />);
+      } catch (e) {
+        console.error("Failed to unmount toast", e);
+      }
+    }
   };
 
-  root.render(
-    <CustomToast
-      title={payload.title}
-      description={payload.description}
-      variant={payload.variant}
-      onClose={cleanup}
-      duration={duration}
-    />
-  );
-
+  renderToast(true);
   if (duration && duration > 0) {
-    setTimeout(cleanup, duration + 100);
+    setTimeout(() => renderToast(false), duration + 100);
   }
 }
