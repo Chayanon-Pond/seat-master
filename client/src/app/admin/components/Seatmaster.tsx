@@ -1,0 +1,131 @@
+"use client";
+
+import React, { useMemo, useState, useEffect } from "react";
+import Cardconcerts from "./Cardconcerts";
+import ConcertCreate from "./Concertcreate";
+import useBooking from "../../../hook/useBooking";
+import { useConcertsContext } from "../context/concertContext";
+
+export default function Seatmaster({
+  onTabChange,
+}: {
+  onTabChange?: (tab: "overview" | "create") => void;
+}) {
+  const { concerts, handleDeleteConcert, fetchConcerts } = useConcertsContext();
+  const [tab, setTab] = useState<"overview" | "create">("overview");
+
+  const handleTabChange = (newTab: "overview" | "create") => {
+    setTab(newTab);
+    onTabChange?.(newTab);
+  };
+
+  const totals = useMemo(() => {
+    const totalSeats = concerts.reduce(
+      (s, c) => s + (c.seat ?? c.available_seats ?? 0),
+      0
+    );
+    const reserve = concerts.reduce((r, c) => r + (c.reserved_seats ?? 0), 0);
+    const cancel = concerts.reduce((r, c) => r + (c.cancelled_seats ?? 0), 0);
+    return { totalSeats, reserve, cancel };
+  }, [concerts]);
+
+  const { stats } = useBooking();
+
+  return (
+    <div className="p-4 sm:p-6 md:p-6">
+      {/* Stats cards */}
+      <div className="flex flex-col sm:flex-row sm:space-x-2.5 gap-4 mb-6">
+        <div className="rounded-[8px] w-full sm:w-[350px] h-auto sm:h-[234px] px-4 py-6 bg-[var(--color-blue)] text-white flex flex-col items-center">
+          <div className="w-10 h-10 rounded-full border border-white flex items-center justify-center mb-4">
+            <img src="/user.svg" alt="user" className="w-4 h-4 sm:w-5 sm:h-5" />
+          </div>
+          <div className="text-[12px] sm:text-sm opacity-90">
+            Total of seats
+          </div>
+          <div className="text-[28px] sm:text-[40px] md:text-[48px] font-semibold mt-4">
+            {totals.totalSeats}
+          </div>
+        </div>
+        <div className="rounded-[8px] w-full sm:w-[350px] h-auto sm:h-[234px] px-4 py-6 bg-[var(--color-teal)] text-white flex flex-col items-center">
+          <div className="w-10 h-10 rounded-full border border-white flex items-center justify-center mb-4">
+            <img
+              src="/award.svg"
+              alt="award"
+              className="w-4 h-4 sm:w-5 sm:h-5"
+            />
+          </div>
+          <div className="text-[12px] sm:text-sm opacity-90">Reserve</div>
+          <div className="text-[28px] sm:text-[40px] md:text-[48px] font-semibold mt-4">
+            {stats ? stats.reserved : totals.reserve}
+          </div>
+        </div>
+        <div className="rounded-[8px] w-full sm:w-[350px] h-auto sm:h-[234px] px-4 py-6 bg-[var(--color-red)] text-white flex flex-col items-center">
+          <div className="w-10 h-10 rounded-full border border-white flex items-center justify-center mb-4">
+            <img
+              src="/x-circle.svg"
+              alt="x-circle"
+              className="w-4 h-4 sm:w-5 sm:h-5"
+            />
+          </div>
+          <div className="text-[12px] sm:text-sm opacity-90">Cancel</div>
+          <div className="text-[28px] sm:text-[40px] md:text-[48px] font-semibold mt-4">
+            {stats ? stats.cancelled : totals.cancel}
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div>
+        <div className="flex items-center justify-between pb-3 mb-4">
+          <div className="flex gap-4 items-center">
+            <button
+              onClick={() => handleTabChange("overview")}
+              style={{ fontFamily: "Roboto, sans-serif" }}
+              className={`text-[18px] sm:text-[20px] md:text-[24px] font-semibold px-3 py-1  cursor-pointer ${
+                tab === "overview"
+                  ? "text-[var(--color-light-blue)] border-b-2 border-[var(--color-light-blue)] pb-1"
+                  : "text-gray-600"
+              }`}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => handleTabChange("create")}
+              style={{ fontFamily: "Roboto, sans-serif" }}
+              className={`text-[18px] sm:text-[20px] md:text-[24px] font-semibold px-3 py-1  cursor-pointer ${
+                tab === "create"
+                  ? "text-[var(--color-light-blue)] border-b-2 border-[var(--color-light-blue)] pb-1"
+                  : "text-gray-600"
+              }`}
+            >
+              Create
+            </button>
+          </div>
+        </div>
+
+        {tab === "overview" && (
+          <div className="space-y-4">
+            {concerts.map((c) => (
+              <Cardconcerts
+                key={c.id}
+                concert={c}
+                onDelete={handleDeleteConcert}
+              />
+            ))}
+          </div>
+        )}
+
+        {tab === "create" && (
+          <div>
+            <ConcertCreate
+              onCreateSuccess={() => {
+                fetchConcerts();
+                handleTabChange("overview");
+              }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
