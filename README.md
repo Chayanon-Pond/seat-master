@@ -1,235 +1,183 @@
-# seat-master
+# Seat Master
 
-This repository contains a two-part application for creating and booking concert seats:
+This repository contains a seat reservation application split into two main parts:
 
-- `client/` — Next.js + React frontend
-- `server/` — NestJS backend API
+- `client/` — Next.js (React) frontend
+- `server/` — NestJS backend (REST API), using PostgreSQL via the `pg` driver
 
-## Quick overview
+This README explains how to run the project locally, the high-level architecture, libraries used, and how to run tests.
 
-This README explains how to run the app locally, the application architecture, notable libraries used, and how to run unit tests.
+## Quick summary
+
+- Frontend: Next.js (App Router) + React 19, TypeScript, Tailwind CSS (configured under `client/`)
+- Backend: NestJS + TypeScript. The server connects to PostgreSQL using a `DATABASE_URL` environment variable (see `server/src/lib/database`).
+- The frontend calls the backend API; the default backend URL is `http://localhost:5000` and can be overridden with `NEXT_PUBLIC_BACKEND_URL`.
+
+## Demo
+
+<img src="client/public/Demo.png" alt="Demo screenshot" style="max-width:50%; height:50%; object-fit:contain;" />
+
+## Where files live
+
+- `client/` — Next.js app and frontend source (Next dev server typically runs on port 3000)
+- `server/` — NestJS API and backend code (default port 5000)
 
 ## Prerequisites
 
-- Node.js (v18+ recommended)
-- npm or yarn
-- PostgreSQL (or any Postgres-compatible database) for the server
-- Git (optional, for cloning)
+- Node.js >= 18
+- npm (or yarn/pnpm)
+- PostgreSQL (or a compatible DB) accessible via a connection string for `DATABASE_URL`
 
-On Windows, run these commands in PowerShell.
+## Local setup (Windows PowerShell)
 
-## Setup — clone and install
-
-1. Clone the repo (if you haven't already):
+1. Clone and open the project
 
 ```powershell
-git clone <repo-url>
-cd seat-master
+git clone <your-repo-url>
 ```
 
-2. Install dependencies for both client and server:
+2. Set environment variables
+
+- Server: create `server/.env` or export environment variables in your shell
+
+```
+DATABASE_URL=postgres://<user>:<password>@<host>:<port>/<database>
+PORT=5000   # optional (defaults to 5000)
+```
+
+- Client: optionally set `client/.env.local` to override backend URL
+
+```
+NEXT_PUBLIC_BACKEND_URL=http://localhost:5000
+```
+
+3. Install dependencies
 
 ```powershell
-cd client
+cd .\client
 npm install
+
+# In another terminal
 cd ..\server
 npm install
-cd ..
 ```
 
-3. Create a local database and provide a connection string.
-
-You can use the example `.env.example` at the repository root as a starting point. Copy it to a `.env` file in the `server/` folder (or set environment variables in your shell):
+4. Run in development mode (two terminals)
 
 ```powershell
-copy .\.env.example .\server\.env
-```
-
-Then edit `server/.env` (or set environment variables) to point to your Postgres instance.
-
-Important env vars:
-
-- `DATABASE_URL` — Full Postgres connection string, e.g. `postgresql://user:password@localhost:5432/seatmaster`
-- `PORT` — Optional. Defaults to `5000` if not set.
-
-Note: The server's `main.ts` enables CORS for `http://localhost:3000`. If you run the frontend on a different host/port, update the server CORS config in `server/src/main.ts`.
-
-## Running the app locally
-
-Start the server API (from project root):
-
-```powershell
-cd server
+# Terminal A: backend (NestJS watch mode)
+cd .\server
 npm run start:dev
-```
 
-The server listens on the port specified in `PORT` or `5000` by default.
-
-Start the client (in a new terminal):
-
-```powershell
-cd client
+# Terminal B: frontend (Next.js)
+cd .\client
 npm run dev
 ```
 
-Open `http://localhost:3000` in your browser.
+When both are running:
 
-## Application architecture (high-level)
+- Frontend: http://localhost:3000
+- Backend: http://localhost:5000
 
-- Frontend (`client/`)
-	- Built with Next.js (app directory) and React 19.
-	- UI uses Tailwind CSS for styling and `react-icons` for icons.
-	- The frontend calls the backend REST endpoints to create bookings and fetch concert data.
-	- Context providers and custom hooks (under `src/context` and `src/hook`) manage state like reserves and bookings.
+5. Build for production
 
-- Backend (`server/`)
-	- Built with NestJS (modular architecture). Entry point is `src/main.ts`.
-	- Database access is done via a small `DatabaseService` that wraps a `pg` Pool; connection string is read from `DATABASE_URL`.
-	- APIs are organized under `src/api/` and split between admin and user endpoints.
-	- Jest is configured for unit and e2e tests.
+```powershell
+# Build and start client (Next)
+cd .\client
+npm run build
+npm run start
 
-## Notable libraries and their role
+# Build and start server (NestJS)
+cd ..\server
+npm run build
+npm run start:prod
+```
 
-- Client
-	- `next` — Framework for React SSR and routing.
-	- `react` / `react-dom` — UI library.
-	- `tailwindcss` — Utility-first CSS framework used for styling.
-	- `axios` — HTTP client used to call backend APIs.
-	- `react-icons` — Icon components.
+## Architecture overview
 
-- Server
-	- `@nestjs/*` — Structural framework for the API (controllers, modules, DI).
-	- `pg` — Postgres client used by `DatabaseService`.
-	- `jest`, `ts-jest`, `supertest` — Testing utilities (unit & e2e tests).
+- The project separates presentation (frontend) from API and persistence (backend).
+- Backend uses NestJS modular structure — controllers and modules are organized under `src/api/` (e.g. `admin`, `users`). A global `DatabaseModule` in `server/src/lib/database` creates a single `pg.Pool` used by the app.
+- Frontend uses Next.js App Router (`client/src/app`) with React Context and custom hooks (e.g. `reserveContext.tsx`, `useBooking.ts`) to manage client state and call backend APIs.
+- The server reads DB configuration from `process.env.DATABASE_URL` and creates a connection pool (see `server/src/lib/database/database.service.ts`).
+- CORS is enabled for `http://localhost:3000` (see `server/src/main.ts`).
 
-## Environment and configuration
+## Important libraries and their roles
 
-- Server reads environment variables via `process.env`. The important ones are described above.
-- `server/src/main.ts` sets default CORS origin to `http://localhost:3000`.
+- Frontend (`client/package.json`):
+
+  - `next` — Next.js framework (routing, SSR/SSG)
+  - `react`, `react-dom` — UI library
+  - `axios` — HTTP client used in parts of the frontend
+  - `react-icons` — icon library
+  - `tailwindcss` — utility-first CSS framework (configured via PostCSS)
+
+- Backend (`server/package.json`):
+
+  - `@nestjs/*` — NestJS framework (DI, controllers, modules)
+  - `pg` — PostgreSQL client driver (connection pool)
+  - `@nestjs/config` — configuration/environment helper (dotenv is invoked in `main.ts`)
+
+- Dev / testing / tooling:
+  - `jest`, `ts-jest`, `supertest` — testing tools configured for the backend
+  - `eslint`, `prettier` — linting and formatting
+  - `typescript` — static typing
+
+## Useful npm scripts (from package.json)
+
+- Client (`client/package.json`)
+
+  - `npm run dev` — start Next.js development server
+  - `npm run build` — build Next app
+  - `npm run start` — start Next in production
+  - `npm run lint` — run ESLint
+
+- Server (`server/package.json`)
+  - `npm run start:dev` — NestJS dev/watch mode
+  - `npm run build` — compile NestJS to `dist/`
+  - `npm run start:prod` — run compiled server (`node dist/main`)
+  - `npm run test` — run Jest unit tests
+  - `npm run test:e2e` — run e2e tests (uses `test/jest-e2e.json`)
 
 ## Running tests
 
-Server unit tests (and e2e) use Jest. From the `server` folder run:
+- Backend
 
 ```powershell
-cd server
-npm test
-
-# or watch
-npm run test:watch
-
-# e2e tests
-npm run test:e2e
+cd .\server
+npm run test          # run unit tests
+npm run test:watch    # run tests in watch mode
+npm run test:e2e      # run e2e tests
 ```
-
-Client tests: There are no client unit tests configured by default. You can add tests with your preferred framework (Jest/React Testing Library / Playwright for E2E).
-
-## Development notes and tips
-
-- If you prefer using `yarn` or `pnpm`, you can substitute `npm install` and `npm run` with the corresponding commands.
-- For database setup, create the Postgres database and run any SQL migrations you manage locally (this project uses a lightweight `DatabaseService`; there are no migration files included in the repo root).
-- Logs: the server prints a `Database connected successfully` message on successful DB connect.
 
 ## Troubleshooting
 
-- PORT in use: If the server fails to start because the port is taken, change `PORT` in `.env` or kill the process using the port.
-- DB connection fail: check `DATABASE_URL` credentials and that Postgres is running and reachable from your machine.
+- If you see "Database connection fail" in server logs, confirm `DATABASE_URL` is valid and the database allows connections from your machine.
+- If ports conflict, change `PORT` for the server or set the `PORT` env for Next.js.
+- Use Node 18+ (project dependencies and TypeScript assume a modern Node runtime).
 
-## Next steps / improvements
+## Suggested next steps
 
-- Provide SQL migrations (e.g., with Prisma or TypeORM) for easier DB setup.
-- Add client-side unit tests and CI scripts.
-- Add a docker-compose for local setup of server + Postgres.
+- Add a `client/.env.example` and `server/.env.example` documenting required env variables
+- Add a simple frontend test setup and `npm run test` script for `client/` (Vitest or Jest)
+- Add a GitHub Actions workflow to run lint/test/build on PRs
 
----
+## Bonus Task
 
-If you'd like, I can:
+- Expressyour opinion about how to optimize your website in case that this
+  website contains intensive data and when more people access, the lower speed
+  you get?
+  Ans:1.Implement cursor-based pagination (page size: 10) 2.Add database indexing on frequently queried columns. 3.Consider load balancing for high traffic.
 
-- Add a `docker-compose.yml` that starts Postgres, server, and client for local development.
-- Add a `server/.env` loader example or script to copy `.env.example` automatically.
+- Expressyour opinion about how to handle when many users want to reserve the
+  ticket at the same time? We want to ensure that in the concerts there is no one
+  that needs to stand up during the show.
+  Ans: Queue System:
 
-Tell me which of those you'd prefer and I can add it next.
+Implement message queue (Redis Queue, RabbitMQ, Bull) for reservation requests
+Process reservations sequentially to prevent race conditions
+Add timeout for payment (e.g., 10 minutes hold)
 
-## Database tables & pagination
-
-Note: ฉันได้สร้างตาราง `bookings`, `concerts`, `history`, และ `users` ในฐานข้อมูล (ดู attachment / DB explorer screenshot). These are the main tables used by the app:
-
-- `bookings` — store booking records referencing `users` and `concerts`.
-- `concerts` — concert metadata (title, date, venue, capacity, etc.).
-- `history` — administrative history/audit entries.
-- `users` — user records.
-
-Because datasets (for example `bookings` or `history`) may grow large, the app uses pagination on list endpoints and a reusable client-side Pagination component to render page controls. The client component is implemented at:
-
-`client/src/app/admin/components/Pagination.tsx`
-
-Server-side pagination (recommended)
-
-We recommend implementing simple limit/offset pagination on the server (fast to add and easy to reason about). A minimal SQL pattern is:
-
-```sql
--- count total rows
-SELECT COUNT(*) FROM concerts;
-
--- fetch a single page (page indexed from 1)
--- limit = items per page, offset = (page - 1) * limit
-SELECT * FROM concerts
-ORDER BY id DESC
-LIMIT $1 OFFSET $2; -- $1 = limit, $2 = offset
-```
-
-Example NestJS service pattern (pseudo-code)
-
-```ts
-// Accept page & limit from query params, default limit=20
-const limit = Math.max(1, Math.min(Number(query.limit) || 20, 200));
-const page = Math.max(1, Number(query.page) || 1);
-const offset = (page - 1) * limit;
-
-const data = await db.query('SELECT * FROM concerts ORDER BY id DESC LIMIT $1 OFFSET $2', [limit, offset]);
-const [{ count }] = await db.query('SELECT COUNT(*) FROM concerts');
-const total = Number(count);
-
-return {
-	data,
-	meta: {
-		total,
-		page,
-		limit,
-		totalPages: Math.ceil(total / limit),
-	},
-};
-```
-
-API contract example
-
-- Request: GET /api/admin/concerts?page=2&limit=20
-- Response (200):
-
-```json
-{
-	"data": [ /* array of concert objects for the requested page */ ],
-	"meta": {
-		"total": 345,
-		"page": 2,
-		"limit": 20,
-		"totalPages": 18
-	}
-}
-```
-
-Client usage
-
-- Use the `Pagination` component to render controls. When the user changes the page, call the API with the new `page` and `limit` query parameters and update the displayed list with `response.data` while reading pagination numbers from `response.meta`.
-
-Indexing and performance tips
-
-- Add indexes on columns you filter or sort by (for example `created_at`, `concert_id`, or `user_id`) to improve list query performance.
-- For very large datasets or infinite-scroll patterns, consider cursor-based pagination instead of limit/offset to avoid performance issues with large offsets.
-
-If you want, I can:
-
-- Implement server-side pagination for the `concerts` and `history` endpoints now (I can modify the NestJS services to accept `page`/`limit` and return `{data, meta}`).
-- Add SQL index suggestions or a simple seed script to generate test data.
-
-Tell me which to do next and I'll implement the changes.
+Example: In online shopping, when 1000 customers try to buy 100
+limited items simultaneously, the queue processes each request
+sequentially to prevent overselling. Unpaid reservations are
+auto-released after 10 minutes.
