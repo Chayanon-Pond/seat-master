@@ -11,7 +11,7 @@ This README explains how to run the project locally, the high-level architecture
 
 - Frontend: Next.js (App Router) + React 19, TypeScript, Tailwind CSS (configured under `client/`)
 - Backend: NestJS + TypeScript. The server connects to PostgreSQL using a `DATABASE_URL` environment variable (see `server/src/lib/database`).
-- The frontend calls the backend API; the default backend URL is `http://localhost:5000` and can be overridden with `NEXT_PUBLIC_BACKEND_URL`.
+- The frontend calls the backend API; the default backend URL is `http://localhost:5000` and can be overridden with `NEXT_PUBLIC_API_URL` (preferred) or `NEXT_PUBLIC_BACKEND_URL`.
 
 ## Demo
 
@@ -48,7 +48,8 @@ PORT=5000   # optional (defaults to 5000)
 - Client: optionally set `client/.env.local` to override backend URL
 
 ```
-NEXT_PUBLIC_BACKEND_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=http://localhost:5000
+# (legacy) NEXT_PUBLIC_BACKEND_URL=http://localhost:5000
 ```
 
 3. Install dependencies

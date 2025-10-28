@@ -53,12 +53,13 @@ export const ConcertProvider = ({ children }: { children: ReactNode }) => {
     limit: 9,
   });
   const concertPerPage = 9;
+  const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
   const fetchConcerts = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/concerts`);
+  const response = await fetch(`${API_URL}/api/admin/concerts`);
       if (!response.ok) {
         throw new Error(`Failed to fetch concerts: ${response.statusText}`);
       }
@@ -108,12 +109,9 @@ export const ConcertProvider = ({ children }: { children: ReactNode }) => {
   const confirmDelete = useCallback(async () => {
     if (!concertToDelete) return;
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/admin/concerts-delete/${concertToDelete}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`${API_URL}/api/admin/concerts-delete/${concertToDelete}`, {
+        method: "DELETE",
+      });
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to delete concert");

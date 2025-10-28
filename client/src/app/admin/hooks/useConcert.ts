@@ -17,17 +17,18 @@ export default function useConcert() {
     const [concerts, setConcerts] = useState<Concert[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
     const fetchConcerts = useCallback(async () => {
         try {
-            const response = await axios.get<Concert[]>("http://localhost:5000/api/admin/concerts");
+            const response = await axios.get<Concert[]>(`${API_URL}/api/admin/concerts`);
             setConcerts(response.data);
         } catch (error) {
             setError("Failed to fetch concerts");
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [API_URL]);
 
     useEffect(() => {
         fetchConcerts();

@@ -48,7 +48,7 @@ export const ReserveProvider = ({ children }: { children: ReactNode }) => {
       return {};
     }
   });
-  const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
+  const BACKEND = (process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000").replace(/\/$/, "");
 
   const ensureConcerts = useCallback((ids: string[]) => {
     setReservedMap((m) => {
@@ -145,7 +145,6 @@ export const ReserveProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     setError(null);
     try {
-      const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
       const response = await fetch(`${BACKEND}/api/admin/concerts`);
       if (!response.ok) {
         throw new Error("Failed to fetch reserves");

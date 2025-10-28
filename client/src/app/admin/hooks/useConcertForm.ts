@@ -23,6 +23,7 @@ export const useConcertForm = (onSuccess?: () => void) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [toast, setToast] = useState<Toast | null>(null);
+    const API_URL = (process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000").replace(/\/$/, "");
     const router = useRouter();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -74,7 +75,7 @@ export const useConcertForm = (onSuccess?: () => void) => {
         }
 
         try {
-            const response = await fetch("http://localhost:5000/api/admin/concerts-create", {
+            const response = await fetch(`${API_URL}/api/admin/concerts-create`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

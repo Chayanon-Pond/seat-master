@@ -34,7 +34,8 @@ export const useHistory = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await axios.get("http://localhost:5000/api/admin/historys-list");
+            const API_URL = (process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000").replace(/\/$/, "");
+            const response = await axios.get(`${API_URL}/api/admin/historys-list`);
             const allData = response.data as History[];
             const totalPages = Math.ceil(allData.length / itemsPerPage);
             

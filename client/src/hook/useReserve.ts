@@ -16,11 +16,13 @@ export default function useReserve() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const BACKEND = (process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000").replace(/\/$/, "");
+
     const fetchReserves = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.get("http://localhost:5000/api/admin/concerts");
+            const response = await axios.get(`${BACKEND}/api/admin/concerts`);
             setReserves(response.data);
         } catch (err) {
             setError("Failed to fetch reserves");
