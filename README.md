@@ -13,6 +13,10 @@ This README explains how to run the project locally, the high-level architecture
 - Backend: NestJS + TypeScript. The server connects to PostgreSQL using a `DATABASE_URL` environment variable (see `server/src/lib/database`).
 - The frontend calls the backend API; the default backend URL is `http://localhost:5000` and can be overridden with `NEXT_PUBLIC_API_URL` (preferred) or `NEXT_PUBLIC_BACKEND_URL`.
 
+## Deployed Website
+
+-You can check the project at : https://seat-master.vercel.app/admin/dashboard
+
 ## Demo
 
 <img src="client/public/Demo.png" alt="Demo screenshot" style="max-width:50%; height:50%; object-fit:contain;" />
